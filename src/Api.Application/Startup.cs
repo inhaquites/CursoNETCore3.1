@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Api.CrossCutting.DependencyIngection;
 using Api.CrossCutting.Mappings;
+using Api.Data.Context;
 using Api.Domain.Security;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -146,6 +147,19 @@ namespace application
       {
         endpoints.MapControllers();
       });
+
+      //rodar migrations na primeira vez que execura o sistema
+      if (Environment.GetEnvironmentVariable("MIGRATION").ToLower() == "APLICAR".ToLower())
+      {
+        using (var service = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
+                                                    .CreateScope())
+        {
+          using (var context = service.ServiceProvider.GetService<MyContext>())
+          {
+            context.Database.Migrate();
+          }
+        }
+      }
     }
   }
 }

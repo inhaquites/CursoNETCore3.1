@@ -1,3 +1,4 @@
+using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
@@ -8,9 +9,29 @@ namespace Api.Data.Context
     public MyContext CreateDbContext(string[] args)
     {
       //Usado para criar as Migrations
-      var connectionString = "Server=localhost;Port=3306;Database=dbAPI;Uid=root;Pwd=So12022016";
+
+      //conexao MySQL
+      //var connectionString = "Server=localhost;Port=3306;Database=dbAPI;Uid=root;Pwd=So12022016";
+      //var optionsBuilder = new DbContextOptionsBuilder<MyContext>();
+      //optionsBuilder.UseMySql(connectionString);
       var optionsBuilder = new DbContextOptionsBuilder<MyContext>();
-      optionsBuilder.UseMySql(connectionString);
+
+      if (Environment.GetEnvironmentVariable("DATABASE").ToLower() == "SQLSERVER".ToLower())
+      {
+        //conexao SQLServer Express
+        var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION");
+        optionsBuilder.UseSqlServer(connectionString);
+      }
+      else
+      {
+        //conexao MySQL
+        var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION");
+        optionsBuilder.UseMySql(connectionString);
+      }
+
+
+
+
       return new MyContext(optionsBuilder.Options);
     }
   }

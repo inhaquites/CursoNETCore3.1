@@ -39,7 +39,7 @@
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "Data.Testes",
+      "label": "Testes",
       "command": "dotnet",
       "type": "process",
       "args": [

@@ -7,16 +7,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Api.Data.Implementations
 {
-  public class UserImplementation : BaseRepository<UserEntity>, IUserRepository
-  {
-    private DbSet<UserEntity> _dataset;
-    public UserImplementation(MyContext context) : base(context)
+    public class UserImplementation : BaseRepository<UserEntity>, IUserRepository
     {
-      _dataset = context.Set<UserEntity>();
+        private readonly DbSet<UserEntity> _dataset;
+        public UserImplementation(MyContext context) : base(context)
+        {
+            _dataset = context.Set<UserEntity>();
+        }
+        public async Task<UserEntity> FindByLogin(string email) =>
+            await _dataset.FirstOrDefaultAsync(u => u.Email.Equals(email));
+
     }
-    public async Task<UserEntity> FindByLogin(string email)
-    {
-      return await _dataset.FirstOrDefaultAsync(u => u.Email.Equals(email));
-    }
-  }
 }

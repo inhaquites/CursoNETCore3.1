@@ -11,7 +11,7 @@ namespace Api.Data.Repository
   public class BaseRepository<T> : IRepository<T> where T : BaseEntity
   {
     protected readonly MyContext _context;
-    private DbSet<T> _dataset;
+    private readonly DbSet<T> _dataset;
 
     public BaseRepository(MyContext context)
     {
@@ -109,7 +109,6 @@ namespace Api.Data.Repository
       }
 
       return item;
-
     }
   }
 }

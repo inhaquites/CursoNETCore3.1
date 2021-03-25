@@ -25,4 +25,4 @@ jobs:
     - name: Build
       run: dotnet build --no-restore  ./src
     - name: Testes Automatizados
-      run: dotnet test --no-build --verbosity normal  ./src
+      run: dotnet test ${{ env.CAMINHO_PROJETO_TESTES }} --verbosity minimal

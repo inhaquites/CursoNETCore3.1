@@ -24,7 +24,12 @@ namespace Api.Data.Test
     {
       var serviceCollection = new ServiceCollection();
       serviceCollection.AddDbContext<MyContext>(c =>
+        //LOCAL
         c.UseSqlServer($"Server=.\\SQLEXPRESS;Initial Catalog={dataBaseName};Integrated Security=True"),
+        //NA WEB
+        //c.UseSqlServer($"Data Source=198.38.83.200; Initial Catalog=ricardoz_solicitacao; User Id=ricardoz_solicitacao; Password=200461;"),
+        //c.UseSqlServer($"Server=198.38.83.200; Initial Catalog={dataBaseName}; User Id=ricardoz_solicitacao; Password=200461;"),
+
         ServiceLifetime.Transient
       );
 

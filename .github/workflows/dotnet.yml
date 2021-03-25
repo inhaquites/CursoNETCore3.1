@@ -10,19 +10,22 @@ jobs:
   build:
   
   env:
-      CAMINHO_PROJETO_TESTES: ././src/Api.Data.Test/Api.Data.Test.csproj      
+      CAMINHO_PROJETO_TESTES: ./src/Api.Data.Test/Api.Data.Test.csproj      
 
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
-    - name: Setup .NET
+    - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.407
+        
     - name: Restore dependencies
       run: dotnet restore ./src
+      
     - name: Build
       run: dotnet build --no-restore  ./src
+      
     - name: Testes Automatizados
       run: dotnet test ${{ env.CAMINHO_PROJETO_TESTES }} --verbosity minimal

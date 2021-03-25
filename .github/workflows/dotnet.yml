@@ -17,11 +17,11 @@ jobs:
       with:
         dotnet-version: 3.1.407
         
-    - name: Restore dependencies
+    - name: Restauração de Dependencies
       run: dotnet restore ./src
       
-    - name: Build
+    - name: Build do Projeto
       run: dotnet build --no-restore  ./src
     
     - name: Testes Automatizados      
-      run: dotnet test ./src/Api.Data.Test/Api.Data.Test.csproj --verbosity minimal
+      run: dotnet test --no-build --verbosity normal  ./src

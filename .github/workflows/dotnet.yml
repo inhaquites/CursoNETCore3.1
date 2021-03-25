@@ -8,7 +8,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -24,7 +23,5 @@ jobs:
     - name: Build
       run: dotnet build --no-restore  ./src
     
-    - name: Testes Automatizados
-      env:
-        CAMINHO_PROJETO_TESTES: ${{ ./src/Api.Data.Test/Api.Data.Test.csproj, '[CAMINHO PROJETO TESTES]' }}    
-      run: dotnet test ${{ env.CAMINHO_PROJETO_TESTES }} --verbosity minimal
+    - name: Testes Automatizados      
+      run: dotnet test ./src/Api.Data.Test/Api.Data.Test.csproj --verbosity minimal

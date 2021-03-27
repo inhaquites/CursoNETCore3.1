@@ -1,0 +1,27 @@
+name: CI - To Develop01 Branch
+
+on:
+  push:
+    branches: [ Develop01 ]
+  pull_request:
+    branches: [ Develop01 ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.407
+        
+    - name: Restauração de Dependencies
+      run: dotnet restore ./src
+      
+    - name: Build do Projeto
+      run: dotnet build --no-restore  ./src
+    
+    #- name: Testes Automatizados      
+      #run: dotnet test --no-build --verbosity normal  ./src

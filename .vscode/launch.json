@@ -25,9 +25,12 @@
         //"DB_CONNECTION":"Server=localhost;Port=3306;Database=dbAPI;Uid=root;Pwd=So12022016",
         //"DATABASE":"MYSQL",
         //SQLServer
-        "DB_CONNECTION": "Server=.\\SQLEXPRESS;Initial Catalog=dbAPI;Integrated Security=True",
+        "DB_CONNECTION": "Server=.\\SQLEXPRESS;Initial Catalog=dbAPI3;Integrated Security=True",
         "DATABASE": "SQLSERVER",
-        "MIGRATION": "NAOAPLICAR"
+        "MIGRATION": "APLICAR",
+        "Audience": "ExemploAudience",
+        "Issuer": "ExemploIssuer",
+        "Seconds": "3600"
       },
       "sourceFileMap": {
         "/Views": "${workspaceFolder}/Views"

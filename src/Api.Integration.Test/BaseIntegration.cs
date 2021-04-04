@@ -50,7 +50,8 @@ namespace Api.Integration.Test
       var jsonLogin = await resultLogin.Content.ReadAsStringAsync();
       var loginObject = JsonConvert.DeserializeObject<LoginResponseDto>(jsonLogin);
 
-      client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginObject.acessToken);
+      client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer",
+                                                        loginObject.accessToken);
     }
 
     public static async Task<HttpResponseMessage> PostJsonAsync(object dataclass, string url, HttpClient client)

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Api.Service.Services
 {
-    public class UserService : IUserService
+  public class UserService : IUserService
   {
     private readonly IRepository<UserEntity> _repository;
     private readonly IMapper _mapper;
@@ -28,7 +28,7 @@ namespace Api.Service.Services
     public async Task<UserDTO> Get(Guid id)
     {
       var entity = await _repository.SelectAsync(id);
-      return _mapper.Map<UserDTO>(entity) ?? new UserDTO();
+      return _mapper.Map<UserDTO>(entity);
     }
 
     public async Task<IEnumerable<UserDTO>> GetAll()

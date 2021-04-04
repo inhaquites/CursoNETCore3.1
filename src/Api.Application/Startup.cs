@@ -20,19 +20,31 @@ namespace application
 {
   public class Startup
   {
-    public Startup(IConfiguration configuration)
+    public Startup(IConfiguration configuration, IWebHostEnvironment environment)
     {
       Configuration = configuration;
+      _environment = environment;
     }
 
     public IConfiguration Configuration { get; }
+    public IWebHostEnvironment _environment { get; }
 
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
+      if (_environment.IsEnvironment("Testing"))
+      {
+        Environment.SetEnvironmentVariable("DB_CONNECTION", "Server=.\\SQLEXPRESS;Initial Catalog=dbAPI_Integration;Integrated Security=True");
+        Environment.SetEnvironmentVariable("DATABASE", "SQLSERVER");
+        Environment.SetEnvironmentVariable("MIGRATION", "APLICAR");
+        Environment.SetEnvironmentVariable("Audience", "ExemploAudience");
+        Environment.SetEnvironmentVariable("Issuer", "ExemploIssuer");
+        Environment.SetEnvironmentVariable("Seconds", "3600");
+      }
+      services.AddControllers();
+
       ConfigureService.ConfigureDependenciesService(services);
       ConfigureRepository.ConfigureDependenciesRepository(services);
-
       var config = new AutoMapper.MapperConfiguration(cfg =>
       {
         cfg.AddProfile(new DtoToModelProfile());
@@ -43,15 +55,8 @@ namespace application
       IMapper mapper = config.CreateMapper();
       services.AddSingleton(mapper);
 
-
       var signingConfigurations = new SigningConfigurations();
       services.AddSingleton(signingConfigurations);
-
-      var tokenConfigurations = new TokenConfigurations();
-      new ConfigureFromConfigurationOptions<TokenConfigurations>(
-        Configuration.GetSection("TokenConfigurations"))
-          .Configure(tokenConfigurations);
-      services.AddSingleton(tokenConfigurations);
 
       services.AddAuthentication(authOptions =>
       {
@@ -61,13 +66,23 @@ namespace application
       {
         var paramsValidation = bearerOptions.TokenValidationParameters;
         paramsValidation.IssuerSigningKey = signingConfigurations.Key;
-        paramsValidation.ValidAudience = tokenConfigurations.Audience;
-        paramsValidation.ValidIssuer = tokenConfigurations.Issuer;
+        paramsValidation.ValidAudience = Environment.GetEnvironmentVariable("Audience");
+        paramsValidation.ValidIssuer = Environment.GetEnvironmentVariable("Issuer");
+
+        //valida a assinatura de um token recebido
         paramsValidation.ValidateIssuerSigningKey = true;
+
+        //verifica se um token recebido ainda é valido
         paramsValidation.ValidateLifetime = true;
+
+        //temo de tolerancia para a expiracao de um token (utilizado
+        // caso haja problemas de sincronismo de horario entre diferentes
+        // computadores envolvidos no processo de comunicacao)
         paramsValidation.ClockSkew = TimeSpan.Zero;
       });
 
+      // Ativa o uso do token como forma de autorizar o acesso
+      // a recursos deste projeto
       services.AddAuthorization(auth =>
       {
         auth.AddPolicy("Bearer", new AuthorizationPolicyBuilder()
@@ -75,8 +90,6 @@ namespace application
                   .RequireAuthenticatedUser().Build());
       });
 
-
-      services.AddControllers();
       services.AddSwaggerGen(c =>
       {
         c.SwaggerDoc("v1", new OpenApiInfo
@@ -97,9 +110,10 @@ namespace application
             Url = new Uri("http://www.inhaquites.com.br")
           }
         });
+
         c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
-          Description = "Informe o Token jwt",
+          Description = "Informe o Token JWT",
           Name = "Authorization",
           In = ParameterLocation.Header,
           Type = SecuritySchemeType.ApiKey
@@ -108,16 +122,15 @@ namespace application
         c.AddSecurityRequirement(new OpenApiSecurityRequirement
         {
           {
-          new OpenApiSecurityScheme {
-            Reference = new OpenApiReference {
-              Id = "Bearer",
-              Type = ReferenceType.SecurityScheme
-            }
-          }, new List<string>()
+            new OpenApiSecurityScheme {
+              Reference = new OpenApiReference {
+                  Id = "Bearer",
+                  Type = ReferenceType.SecurityScheme
+              }
+            }, new List<string>()
           }
         });
       });
-
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,5 +1,5 @@
-using Api.Domain.DTOs.User;
-using Api.Domain.Interfaces.Services.User;
+using Api.Domain.DTOs.Municipio;
+using Api.Domain.Interfaces.Services.Municipio;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -10,11 +10,11 @@ namespace Api.Application.Controllers
 {
   [Route("api/[controller]")]
   [ApiController]
-  public class UsersController : ControllerBase
+  public class MunicipiosController : ControllerBase
   {
-    private readonly IUserService _service;
+    private readonly IMunicipioService _service;
 
-    public UsersController(IUserService service)
+    public MunicipiosController(IMunicipioService service)
     {
       _service = service;
     }
@@ -34,13 +34,12 @@ namespace Api.Application.Controllers
       catch (ArgumentException e)
       {
         return StatusCode((int)HttpStatusCode.InternalServerError, e.Message);
-
       }
     }
 
     [Authorize("Bearer")]
     [HttpGet]
-    [Route("{id}", Name = "GetWithId")]
+    [Route("{id}", Name = "GetMunicipioWithId")]
     public async Task<ActionResult> Get(Guid id)
     {
       if (!ModelState.IsValid)
@@ -60,9 +59,14 @@ namespace Api.Application.Controllers
       }
     }
 
-    [AllowAnonymous]
-    [HttpPost]
-    public async Task<ActionResult> Post([FromBody] UserDTOCreate user)
+    /// <summary>
+    /// Busca Obj completo por ID
+    /// </summary>
+    /// <returns>Busca Municipio completo por ID</returns>
+    [Authorize("Bearer")]
+    [HttpGet]
+    [Route("CompleteById/{id}")]
+    public async Task<ActionResult> GetCompleteById(Guid id)
     {
       if (!ModelState.IsValid)
       {
@@ -70,13 +74,58 @@ namespace Api.Application.Controllers
       }
       try
       {
-        var result = await _service.Post(user);
+        var result = await _service.GetCompleteById(id);
+        if (result == null)
+          return NotFound();
+        return Ok(result);
+      }
+      catch (ArgumentException e)
+      {
+        return StatusCode((int)HttpStatusCode.InternalServerError, e.Message);
+      }
+    }
 
+
+    /// <summary>
+    /// retorna municipio pelo codigo do IBGE
+    /// </summary>
+    /// <param name="codIBGE">Código do IBGE</param>
+    /// <returns>Busca Municipio completo por Código do IBGE</returns>
+    [Authorize("Bearer")]
+    [HttpGet]
+    [Route("CompleteByIBGE/{codIBGE}")]
+    public async Task<ActionResult> GetCompleteByIBGE(int codIBGE)
+    {
+      if (!ModelState.IsValid)
+      {
+        return BadRequest(ModelState); //400 bad request - solicitacao inválida
+      }
+      try
+      {
+        var result = await _service.GetCompleteByIBGE(codIBGE);
+        if (result == null)
+          return NotFound();
+        return Ok(result);
+      }
+      catch (ArgumentException e)
+      {
+        return StatusCode((int)HttpStatusCode.InternalServerError, e.Message);
+      }
+    }
+
+    [Authorize("Bearer")]
+    [HttpPost]
+    public async Task<ActionResult> Post([FromBody] MunicipioDtoCreate dtoCreate)
+    {
+      if (!ModelState.IsValid)
+      {
+        return BadRequest(ModelState); //400 bad request - solicitacao inválida
+      }
+      try
+      {
+        var result = await _service.Post(dtoCreate);
         if (result != null)
-        {
-          return Created(new Uri(Url.Link("GetWithId", new { id = result.Id })), result);
-        }
-
+          return Created(new Uri(Url.Link("GetMunicipioWithId", new { id = result.Id })), result);
         return BadRequest();
       }
       catch (ArgumentException e)
@@ -87,22 +136,17 @@ namespace Api.Application.Controllers
 
     [Authorize("Bearer")]
     [HttpPut]
-    public async Task<ActionResult> Put([FromBody] UserDTOUpdate user)
+    public async Task<ActionResult> Put([FromBody] MunicipioDtoUpdate dtoUpdate)
     {
       if (!ModelState.IsValid)
       {
         return BadRequest(ModelState); //400 bad request - solicitacao inválida
       }
-
       try
       {
-        var result = await _service.Put(user);
-
+        var result = await _service.Put(dtoUpdate);
         if (result != null)
-        {
           return Ok(result);
-        }
-
         return BadRequest();
       }
       catch (ArgumentException e)
@@ -110,7 +154,6 @@ namespace Api.Application.Controllers
         return StatusCode((int)HttpStatusCode.InternalServerError, e.Message);
       }
     }
-
 
     [Authorize("Bearer")]
     [HttpDelete]
@@ -130,6 +173,7 @@ namespace Api.Application.Controllers
         return StatusCode((int)HttpStatusCode.InternalServerError, e.Message);
       }
     }
+
 
   }
 }

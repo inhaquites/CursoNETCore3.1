@@ -1,36 +1,37 @@
 using System.Threading.Tasks;
 using Api.Application.Controllers;
-using Api.Domain.Interfaces.Services.User;
+using Api.Domain.Interfaces.Services.Municipio;
 using Xunit;
 using Moq;
-using Api.Domain.DTOs.User;
+using Api.Domain.DTOs.Municipio;
 using System;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Api.Application.Test.Usuario.QuandoRequisitarGet
+namespace Api.Application.Test.Municipio.QuandoRequisitarGet
 {
   public class Retorno_BadRequest
   {
-    private UsersController _controller;
+    private MunicipiosController _controller;
 
     [Fact(DisplayName = "É possível realizar o Get")]
     public async Task E_Possivel_Invocar_a_Controller_Get()
     {
-      var serviceMock = new Mock<IUserService>();
-      var nome = Faker.Name.FullName();
-      var email = Faker.Internet.Email();
+      var serviceMock = new Mock<IMunicipioService>();
+      var Nome = Faker.Address.City();
+      var codIBGE = Faker.RandomNumber.Next(1000000, 9999999);
+      var UfId = Guid.NewGuid();
 
       serviceMock.Setup(c => c.Get(It.IsAny<Guid>())).ReturnsAsync(
-          new UserDTO
+          new MunicipioDto
           {
             Id = Guid.NewGuid(),
-            Name = nome,
-            Email = email,
-            CreateAt = DateTime.UtcNow
+            Nome = Nome,
+            CodIBGE = codIBGE,
+            UfId = UfId
           }
         );
 
-      _controller = new UsersController(serviceMock.Object);
+      _controller = new MunicipiosController(serviceMock.Object);
       _controller.ModelState.AddModelError("Id", "Formato invalido");
 
       var result = await _controller.Get(Guid.NewGuid());

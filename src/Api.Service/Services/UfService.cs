@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Api.Domain.DTOs.Uf;
 using Api.Domain.Interfaces.Services.Uf;
@@ -28,7 +29,7 @@ namespace Api.Service.Services
     public async Task<IEnumerable<UfDto>> GetAll()
     {
       var listEntity = await _repository.SelectAsync();
-      return _mapper.Map<IEnumerable<UfDto>>(listEntity);
+      return _mapper.Map<IEnumerable<UfDto>>(listEntity.OrderBy(u => u.Nome));
     }
   }
 }

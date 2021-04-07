@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Api.Domain.DTOs.Municipio;
 using Api.Domain.Entities;
@@ -40,7 +41,7 @@ namespace Api.Service.Services
     public async Task<IEnumerable<MunicipioDto>> GetAll()
     {
       var listentity = await _repository.SelectAsync();
-      return _mapper.Map<IEnumerable<MunicipioDto>>(listentity);
+      return _mapper.Map<IEnumerable<MunicipioDto>>(listentity.OrderBy(m => m.Nome));
     }
 
     public async Task<MunicipioDtoCreateResult> Post(MunicipioDtoCreate municipio)

@@ -29,9 +29,15 @@ namespace Api.Integration.Test.Uf
       Assert.True(listaFromJson.Count() == 27);
       Assert.True(listaFromJson.Where(x => x.Sigla == "RS").Count() == 1);
 
+      var id = listaFromJson.Where(x => x.Sigla == "RS").FirstOrDefault().Id;
+      response = await client.GetAsync($"{hostApi}Ufs/{id}");
+      Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+      jsonResult = await response.Content.ReadAsStringAsync();
 
-
-
+      var registroSelecionado = JsonConvert.DeserializeObject<UfDto>(jsonResult);
+      Assert.NotNull(registroSelecionado);
+      Assert.Equal("Rio Grande do Sul", registroSelecionado.Nome);
+      Assert.Equal("RS", registroSelecionado.Sigla);
     }
 
   }

@@ -24,7 +24,7 @@ namespace Api.Service.Test.Login
         authenticated = true,
         created = DateTime.UtcNow,
         expiration = DateTime.UtcNow.AddHours(8),
-        acessToken = Guid.NewGuid(),
+        accessToken = Guid.NewGuid(),
         userName = email,
         name = Faker.Name.FullName(),
         message = "Usuário Logado com sucesso"

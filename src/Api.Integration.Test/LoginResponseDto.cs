@@ -25,6 +25,5 @@ namespace Api.Integration.Test
 
     [JsonProperty("message")]
     public string message { get; set; }
-
   }
 }

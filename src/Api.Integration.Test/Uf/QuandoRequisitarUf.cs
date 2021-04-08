@@ -29,6 +29,7 @@ namespace Api.Integration.Test.Uf
       Assert.True(listaFromJson.Count() == 27);
       Assert.True(listaFromJson.Where(x => x.Sigla == "RS").Count() == 1);
 
+      //get
       var id = listaFromJson.Where(x => x.Sigla == "RS").FirstOrDefault().Id;
       response = await client.GetAsync($"{hostApi}Ufs/{id}");
       Assert.Equal(HttpStatusCode.OK, response.StatusCode);

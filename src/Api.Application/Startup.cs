@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
@@ -57,6 +58,23 @@ namespace application
 
       var signingConfigurations = new SigningConfigurations();
       services.AddSingleton(signingConfigurations);
+
+      //teste
+      services.AddCors(c =>
+      {
+        c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+      });
+      // services.AddCors(options =>
+      //   {
+      //     options.AddPolicy(name: "MyPolicy",
+      //         builder =>
+      //         {
+      //           builder.WithOrigins("http:localhost:4200")
+      //                                 .WithHeaders(HeaderNames.ContentType, "x-custom-header")
+      //                     .WithMethods("PUT", "DELETE", "GET", "POST");
+      //         });
+      //   });
+
 
       services.AddAuthentication(authOptions =>
       {
@@ -150,6 +168,12 @@ namespace application
 
       app.UseRouting();
 
+      app.UseCors(option => option
+          .AllowAnyOrigin()
+          .AllowAnyHeader()
+          .AllowAnyMethod()
+          );
+
       app.UseAuthorization();
 
       app.UseEndpoints(endpoints =>
@@ -169,6 +193,8 @@ namespace application
           }
         }
       }
+
+
     }
   }
 }

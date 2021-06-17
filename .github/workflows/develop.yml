@@ -11,7 +11,8 @@ env:
 
 jobs:
 #------------------------------------------------------------
-  Service_tests:
+  Service-tests:
+    
     runs-on: ubuntu-latest
     
     steps:

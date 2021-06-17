@@ -60,7 +60,7 @@ jobs:
       
 #------------------------------------------------------------
   build:  
-    needs: [tests]
+    needs: [Service-tests]
     
     runs-on: ubuntu-latest
 

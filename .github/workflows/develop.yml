@@ -7,7 +7,7 @@ on:
     branches: [ Develop01 ]
     
 env:
-  CAMINHO_PROJETO_TESTES: ./src/Api.Service.Test/Api.Service.Test.csproj
+  CAMINHO_PROJETO_TESTES: ./src/Api.Service.Test
 
 jobs:
 #------------------------------------------------------------

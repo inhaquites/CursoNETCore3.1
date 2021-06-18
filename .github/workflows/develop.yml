@@ -7,7 +7,8 @@ on:
     branches: [ Develop01 ]
     
 env:
-  CAMINHO_PROJETO_TESTES: ./src/Api.Service.Test
+  CAMINHO_PROJETO_TESTES_SERVICE: ./src/Api.Service.Test
+  CAMINHO_PROJETO_TESTES_APPLICATION: ./src/Api.Application.Test
 
 jobs:
 #------------------------------------------------------------
@@ -23,7 +24,7 @@ jobs:
         dotnet-version: 3.1.407
 
     - name: Testes Automatizados com .Net Core 3.1 + XUnit + Coverlet
-      run: dotnet test ${{ env.CAMINHO_PROJETO_TESTES }} --verbosity minimal --logger:"html;LogFileName=resultado-testes.html" --collect:"XPlat Code Coverage"
+      run: dotnet test ${{ env.CAMINHO_PROJETO_TESTES_SERVICE }} --verbosity minimal --logger:"html;LogFileName=resultado-testes-service.html" --collect:"XPlat Code Coverage"
       
     - name: Instalar ReportGenerator
       if: success()
@@ -32,7 +33,7 @@ jobs:
     - name: Gerar relatório de cobertura de testes com ReportGenerator
       if: success()
       run: |
-        cd ${{ env.CAMINHO_PROJETO_TESTES }}/TestResults
+        cd ${{ env.CAMINHO_PROJETO_TESTES_SERVICE }}/TestResults
         # Acessar diretório gerado com o XML de Cobertura de código
         cd $(ls -d */|head -n 1)
         reportgenerator "-reports:coverage.cobertura.xml" "-targetdir:coveragereport" -reporttypes:Html
@@ -40,7 +41,7 @@ jobs:
     - name: Upload como Artifact dos Reports de Resultado de Testes Executados com Sucesso + Cobertura de Código
       uses: actions/upload-artifact@v2.2.2
       env:
-        CAMINHO_RESULTADO_TESTES: ${{ env.CAMINHO_PROJETO_TESTES }}/TestResults/
+        CAMINHO_RESULTADO_TESTES: ${{ env.CAMINHO_PROJETO_TESTES_SERVICE }}/TestResults/
       if: success()
       with:
         name: resultado-testes
@@ -51,16 +52,63 @@ jobs:
       uses: actions/upload-artifact@v2.2.2
       if: failure()
       env:
-        CAMINHO_RELATORIO_ERROS: ${{ env.CAMINHO_PROJETO_TESTES }}/TestResults/resultado-testes.html
+        CAMINHO_RELATORIO_ERROS: ${{ env.CAMINHO_PROJETO_TESTES_SERVICE }}/TestResults/resultado-testes-service.html
       with:
         name: resultado-erros-testes
         path: ${{ env.CAMINHO_RELATORIO_ERROS }}
         retention-days: 30
+#------------------------------------------------------------      
+  Application-tests:
+    needs: [Service-tests]
+    
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.407
+
+    - name: Testes Automatizados com .Net Core 3.1 + XUnit + Coverlet
+      run: dotnet test ${{ env.CAMINHO_PROJETO_TESTES_APPLICATION }} --verbosity minimal --logger:"html;LogFileName=resultado-testes-application.html" --collect:"XPlat Code Coverage"
+      
+    - name: Instalar ReportGenerator
+      if: success()
+      run: dotnet tool install --global dotnet-reportgenerator-globaltool --version 4.8.4
+  
+    - name: Gerar relatório de cobertura de testes com ReportGenerator
+      if: success()
+      run: |
+        cd ${{ env.CAMINHO_PROJETO_TESTES_APPLICATION }}/TestResults
+        # Acessar diretório gerado com o XML de Cobertura de código
+        cd $(ls -d */|head -n 1)
+        reportgenerator "-reports:coverage.cobertura.xml" "-targetdir:coveragereport" -reporttypes:Html
+
+    - name: Upload como Artifact dos Reports de Resultado de Testes Executados com Sucesso + Cobertura de Código
+      uses: actions/upload-artifact@v2.2.2
+      env:
+        CAMINHO_RESULTADO_TESTES: ${{ env.CAMINHO_PROJETO_TESTES_APPLICATION }}/TestResults/
+      if: success()
+      with:
+        name: resultado-testes
+        path: ${{ env.CAMINHO_RESULTADO_TESTES }}
+        retention-days: 30
+
+    - name: Upload como Artifact do Report de Testes com Falhas
+      uses: actions/upload-artifact@v2.2.2
+      if: failure()
+      env:
+        CAMINHO_RELATORIO_ERROS: ${{ env.CAMINHO_PROJETO_TESTES_APPLICATION }}/TestResults/resultado-testes-application.html
+      with:
+        name: resultado-erros-testes
+        path: ${{ env.CAMINHO_RELATORIO_ERROS }}
+        retention-days: 30      
       
       
 #------------------------------------------------------------
   build:  
-    needs: [Service-tests]
+    needs: [Service-tests, Application-tests]
     
     runs-on: ubuntu-latest
 
